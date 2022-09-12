@@ -7,9 +7,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import br.senai.sp.jandira.model.Tabuada;
@@ -21,9 +25,10 @@ import br.senai.sp.jandira.model.Tabuada;
 		public int largura;
 		
 		public Color azulCiano = new Color(123, 139, 154);
-		public Color roxo = new Color(200, 162, 200);
-		public Color corBotao = new Color(200, 162, 200);
-		public Color corPainel = new Color(200, 162, 200);
+		public Color black = new Color(0,0,0);
+		public Color ghostwhite = new Color(248,248,255);
+		public Color botaoCalcular = new Color(203,224,233);
+		public Color botaoLimpar = new Color(248, 248, 248);
 		public Font fontTitulo = new Font ("Arial", Font.BOLD, 30);
 		public Font fontLabel = new Font ("Arial narrow", Font.ITALIC, 15);
 			
@@ -40,6 +45,7 @@ import br.senai.sp.jandira.model.Tabuada;
 		
 			//Pegar o container para colocar componentes dentro dele
 			Container painel = tela.getContentPane();
+			painel.setBackground(azulCiano);
 
 			//Criando os componentes e configurando para o container
 
@@ -48,10 +54,15 @@ import br.senai.sp.jandira.model.Tabuada;
 			Font fTabuada = new Font("SansSerif", Font.BOLD, 30);
 			labelTabuada.setText("Tabuada 1.0");
 			labelTabuada.setBounds(100, 20, 200, 30);
-			labelTabuada.setForeground(azulCiano);
+			labelTabuada.setForeground(black);
 			labelTabuada.setFont(fTabuada);
 
 			//Componente Multiplicando
+			
+			JLabel imagem = new JLabel();
+			imagem.setIcon(new ImageIcon("src/img/calculator.png"));
+			imagem.setBounds(50, 20, 100, 30);
+			
 			JLabel labelMultiplicando = new JLabel();
 			Font fMultiplicadores = new Font("SansSerif", Font.PLAIN , 23);
 			JTextField textFieldMultiplicando = new JTextField();
@@ -92,25 +103,25 @@ import br.senai.sp.jandira.model.Tabuada;
 
 			//Componente Botão Limpar
 			JButton buttonLimpar = new JButton();
-			Color corLimpar = new Color(238,173,45);
+			Color corLimpar = new Color(248,248,248);
 			buttonLimpar.setText("Limpar");
 			buttonLimpar.setBounds(275,310,150,35);
-			buttonLimpar.setForeground(Color.white);
+			buttonLimpar.setForeground(Color.black);
 			buttonLimpar.setBackground(corLimpar);
 
 			//Componente Resultado
 			JLabel labelResultado = new JLabel();
-			Font fResultado = new Font("SansSerif", Font.BOLD , 16);
-			JTextField textFieldResultado = new JTextField();
-			Color corResultado = new Color(255,255,200);
 			labelResultado.setText("Resultado:");
 			labelResultado.setBounds(39, 360, 100, 35);
-			labelResultado.setFont(fResultado);
-			textFieldResultado.setBounds(39, 400, 400, 200);
-			textFieldResultado.setBackground(corResultado);
-
+			
+			JScrollPane scroll = new JScrollPane();
+			scroll.setBounds(39, 400, 400, 200);
+			JList listagem = new JList();
+			listagem.setForeground(black);
+			
 			//Painel de aparição dos Labels
 			painel.add(labelTabuada);
+			painel.add(imagem);
 			painel.add(labelMultiplicando);
 			painel.add(labelMinimoMultiplicador);
 			painel.add(labelMaximoMultiplicador);
@@ -120,7 +131,8 @@ import br.senai.sp.jandira.model.Tabuada;
 			painel.add(textFieldMultiplicando);
 			painel.add(textFieldMinimoMultiplicador);
 			painel.add(textFieldMaximoMultiplicador);
-			painel.add(textFieldResultado);
+			painel.add(scroll);
+			painel.add(listagem);
 
 			//Painel de aparição dos Botões
 			painel.add(buttonCalcular);
@@ -132,19 +144,58 @@ import br.senai.sp.jandira.model.Tabuada;
 			//Definindo ActionListener(Ouvinte)
 
 			buttonCalcular.addActionListener(new ActionListener() {
-				
-
+			
 				@Override
 				public void actionPerformed(ActionEvent e) {
 
+					if(textFieldMultiplicando.getText().isEmpty()) {
+						JOptionPane.showMessageDialog(null, "Por favor, insira um Multiplicador.", "Erro", JOptionPane.ERROR_MESSAGE);
+						textFieldMultiplicando.requestFocus();
+						
+					}else if(textFieldMinimoMultiplicador.getText().isEmpty()) {
+						JOptionPane.showMessageDialog(null, "Por favor, insira um Multiplicador Minimo.", "Erro", JOptionPane.ERROR_MESSAGE);
+						textFieldMinimoMultiplicador.requestFocus();
+						
+					}else if(textFieldMaximoMultiplicador.getText().isEmpty()) {
+						JOptionPane.showMessageDialog(null, "Por favor, insira um Multiplicador Maximo.", "Erro", JOptionPane.ERROR_MESSAGE);
+						textFieldMaximoMultiplicador.requestFocus();
+						
+					}else{
+					
 					Tabuada tabuada = new Tabuada();
-					tabuada.multiplicadorMaximo = Integer.parseInt(textFieldMultiplicando.getText());
-					tabuada.multiplicadorMinimo = Integer.parseInt(textFieldMultiplicando.getText());
-					tabuada.multiplicadorMaximo = Integer.parseInt(textFieldMultiplicando.getText());
+					tabuada.entrada = Integer.parseInt(textFieldMultiplicando.getText());
+					tabuada.multiplicadorMaximo = Integer.parseInt(textFieldMaximoMultiplicador.getText());
+					tabuada.multiplicadorMinimo = Integer.parseInt(textFieldMinimoMultiplicador.getText());
 
+					if(tabuada.multiplicadorMaximo < tabuada.multiplicadorMinimo) {
+						JOptionPane.showMessageDialog(null, "O multilicador mínimo é maior que o máximo, digitar valor menor", "Erro!" , JOptionPane.OK_OPTION);
+						textFieldMinimoMultiplicador.setText("");
+						textFieldMaximoMultiplicador.setText("");	
+						
+					}else{
+						
+							listagem.setListData(tabuada.getMultiply());
+							scroll.getViewport().add(listagem);
+						
+					}
 				}
-
+			}
+		});
+			
+			buttonLimpar.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+				textFieldMultiplicando.setText("");
+				textFieldMinimoMultiplicador.setText("");
+				textFieldMaximoMultiplicador.setText("");
+				
+				// Limpar o JList
+				String[] limpar = {""};
+				listagem.setListData(limpar);
+				
+				}
 			});
-	
 		}
 }
+		
